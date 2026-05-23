@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# good-beef-web
 
-## Getting Started
+Next.js frontend for [goodbeef.pl](https://goodbeef.pl). The homepage renders the Good Beef landing layout and loads content from **good-beef-strapi** on the server.
 
-First, run the development server:
+## Prerequisites
+
+- Node.js 20+
+- [good-beef-strapi](../good-beef-strapi) running on port **1337**
+- Landing assets synced from [good-beef-html/goodbeef-landing-page](../good-beef-html/goodbeef-landing-page)
+
+## Setup
+
+```bash
+cd good-beef-web
+cp .env.example .env.local
+npm install
+npm run sync:landing-assets
+```
+
+In **good-beef-strapi** (separate terminal):
+
+```bash
+cd good-beef-strapi
+npm install
+npm run develop
+# First time or empty DB:
+npm run seed:landing
+```
+
+## Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description |
+|----------|-------------|
+| `STRAPI_URL` | Strapi API base URL (default `http://localhost:1337`) |
+| `STRAPI_API_TOKEN` | Optional API token if public permissions are restricted |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start Next.js dev server |
+| `npm run build` | Production build |
+| `npm run sync:landing-assets` | Copy CSS/JS/images from `good-beef-html/goodbeef-landing-page/assets` into `public/landing/assets` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Static theme**: `/public/landing/assets` (Corvex / Good Beef landing CSS and JS)
+- **Dynamic content**: Strapi REST API (`lib/strapi/getHomePageData.ts`), fetched in `app/page.tsx` (Server Components)
+- **Interactivity**: jQuery plugins loaded sequentially via `components/landing/LandingScripts.tsx`
