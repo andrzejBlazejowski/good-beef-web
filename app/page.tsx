@@ -19,12 +19,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
+  let data: Awaited<ReturnType<typeof getHomePageData>> | null = null;
+  let errorMessage: string | null = null;
+
   try {
-    const data = await getHomePageData();
-    return <LandingPage data={data} />;
+    data = await getHomePageData();
   } catch (error) {
-    const message =
+    errorMessage =
       error instanceof Error ? error.message : "Nie udało się połączyć ze Strapi.";
-    return <StrapiUnavailable message={message} />;
   }
+
+  if (errorMessage) {
+    return <StrapiUnavailable message={errorMessage} />;
+  }
+
+  return <LandingPage data={data!} />;
 }
