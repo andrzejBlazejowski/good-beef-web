@@ -1,4 +1,5 @@
-import { formatFaqAnswerHtml, multilineToBr } from "@/lib/landing/format";
+import { FaqAccordion } from "./FaqAccordion";
+import { multilineToBr } from "@/lib/landing/format";
 import { getStrapiMediaUrl, landingAsset } from "@/lib/strapi/media";
 import type { FaqItem, FaqSection as FaqSectionData } from "@/lib/strapi/types";
 
@@ -27,33 +28,7 @@ export function FaqSection({ section, items }: Props) {
               <div className="shape1">
                 <img src={landingAsset("images/shape/shape-3.png")} alt="animowane żeberko" />
               </div>
-              <div className="accordion-box">
-                <div className="shape2 float-bob-y">
-                  <img
-                    className="paroller-2"
-                    src={landingAsset("images/shape/shape-2.png")}
-                    alt="animowana grupa kropek"
-                  />
-                </div>
-                {items.map((item) => (
-                  <div
-                    key={item.documentId ?? item.question}
-                    className="accordion accordion-block"
-                  >
-                    <div
-                      className={`accord-btn${item.defaultOpen ? " active" : ""}`}
-                    >
-                      <h4>{item.question}</h4>
-                    </div>
-                    <div
-                      className={`accord-content${item.defaultOpen ? " collapsed" : ""}`}
-                      dangerouslySetInnerHTML={{
-                        __html: formatFaqAnswerHtml(item.answer),
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
+              <FaqAccordion items={items} />
             </div>
           </div>
 
