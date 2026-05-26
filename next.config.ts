@@ -1,32 +1,38 @@
 import type { NextConfig } from "next";
+import { getStrapiMediaBaseUrl } from "./lib/strapi/media";
 
 const strapiUrl = process.env.STRAPI_URL ?? "http://localhost:1337";
-let strapiHostname = "localhost";
-try {
-  strapiHostname = new URL(strapiUrl).hostname;
-} catch {
-  // keep default
+const strapiMediaUrl = getStrapiMediaBaseUrl();
+
+function hostnameFromUrl(url: string, fallback: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return fallback;
+  }
 }
+
+const imageHostnames = Array.from(
+  new Set([
+    hostnameFromUrl(strapiUrl, "localhost"),
+    hostnameFromUrl(strapiMediaUrl, "localhost"),
+  ])
+);
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
+    remotePatterns: imageHostnames.flatMap((hostname) => [
       {
         protocol: "http",
-        hostname: strapiHostname,
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: strapiHostname,
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "shop.goodbeef.pl",
+        hostname,
         pathname: "/**",
       },
-    ],
+      {
+        protocol: "https",
+        hostname,
+        pathname: "/**",
+      },
+    ]),
   },
 };
 
